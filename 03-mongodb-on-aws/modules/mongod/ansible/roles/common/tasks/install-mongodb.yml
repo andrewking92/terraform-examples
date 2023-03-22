@@ -1,0 +1,43 @@
+---
+- name: "Copy MongoDB Repository File"
+  copy:
+    src: "../files/{{mongodb_repo}}"
+    dest: "/etc/yum.repos.d/{{mongodb_repo}}"
+    owner: root
+    group: root
+    mode: "u=rw,g=r,o=r"
+  become: true
+
+- name: "Install MongoDB"
+  yum: 
+    name: mongodb-enterprise
+    state: latest
+  become: true
+
+- name: "Create dbpath for Application Database"
+  file:
+    state: directory
+    path: "{{ item }}"
+    owner: mongod
+    group: mongod
+    mode: 0775
+  loop:
+    - /data/db
+    - /data/log
+    - /data/audit
+
+- name: "Copy mongod configuration file"
+  copy:
+    src: "../files/mongod.conf"
+    dest: "/etc/mongod.conf"
+    owner: root
+    group: root
+    mode: "u=rw,g=r,o=r"
+  become: true
+
+- name: "Start mongod for the Application Database"
+  service:
+    name: mongod
+    state: started
+    enabled: yes
+  become: true
