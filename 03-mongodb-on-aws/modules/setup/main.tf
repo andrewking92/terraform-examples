@@ -62,6 +62,13 @@ resource "aws_default_security_group" "infra-aws-mongodb" {
   vpc_id      = aws_vpc.infra-aws-mongodb.id
 
   ingress {
+    protocol  = -1
+    self      = true
+    from_port = 0
+    to_port   = 0
+  }
+
+  ingress {
     description      = "SSH to VPC"
     from_port        = 22
     to_port          = 22
